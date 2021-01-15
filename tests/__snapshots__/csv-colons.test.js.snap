@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSV: colon delimiter: csv-colons.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "b",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z",
+  ],
+]
+`;

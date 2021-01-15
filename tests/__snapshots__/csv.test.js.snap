@@ -1,0 +1,244 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSV: empty-cells.csv: empty-cells.csv 1`] = `
+Array [
+  Array [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ],
+  Array [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ],
+  Array [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ],
+]
+`;
+
+exports[`CSV: empty-file.csv: empty-file.csv 1`] = `Array []`;
+
+exports[`CSV: json-data.csv: json-data.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "_-_-_-[{\\"title\\":\\"aaaaaa\\",\\"abstract\\":\\"\\",\\"article_id\\":\\"82ec82fb-33b2-42e8-a8aa-2f19cc7a135e\\",\\"widgets\\":\\"[{\\\\\\"type\\\\\\":\\\\\\"Img\\\\\\",\\\\\\"options\\\\\\":{\\\\\\"singleImg\\\\\\":{\\\\\\"media_id\\\\\\":\\\\\\"af939acc-a252-4712-9f51-72afef0fac4a.jpg\\\\\\",\\\\\\"src\\\\\\":\\\\\\"http://google.com\\\\\\",\\\\\\"type\\\\\\":0,\\\\\\"star\\\\\\"",
+    "b",
+  ],
+  Array [
+    "a",
+    "{\\"a\\":3,\\"b\\":4,\\"c\\":{\\"some\\":\\"string\\"}}",
+    "c",
+  ],
+]
+`;
+
+exports[`CSV: kitchen-sink.csv: kitchen-sink.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "",
+    "",
+    "",
+  ],
+  Array [
+    "a\\"",
+    "b",
+    "",
+  ],
+  Array [
+    "a\\\\\\"",
+    "b",
+    "c",
+  ],
+  Array [
+    "a
+
+",
+    "b
+
+",
+    "c",
+  ],
+  Array [
+    "a",
+    "{\\"a\\":3,\\"b\\":4,\\"c\\":{\\"some\\":\\"string\\"}}",
+    "c",
+  ],
+  Array [
+    "\\\\x\\"\\"x\\"\\"\\"",
+    "\\\\y",
+    "z\\\\\\\\\\\\\\\\\\\\\\"",
+  ],
+  Array [
+    "a",
+    "b,",
+    "c",
+  ],
+]
+`;
+
+exports[`CSV: newlines.csv: newlines.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a
+
+",
+    "b
+
+",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z
+
+",
+  ],
+]
+`;
+
+exports[`CSV: quoted.csv: quoted.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "b",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z",
+  ],
+]
+`;
+
+exports[`CSV: quoted-with-escape.csv: quoted-with-escape.csv 1`] = `
+Array [
+  Array [
+    "A\\\\\\"",
+    "B",
+    "C",
+  ],
+  Array [
+    "\\\\a",
+    "b\\\\\\\\\\\\\\"",
+    "c",
+  ],
+  Array [
+    "\\\\x",
+    "\\\\y",
+    "z\\\\\\\\\\\\\\\\\\\\\\"",
+  ],
+]
+`;
+
+exports[`CSV: quoted-with-escape-and-quote.csv: quoted-with-escape-and-quote.csv 1`] = `
+Array [
+  Array [
+    "A\\\\\\"\\"",
+    "B",
+    "C",
+  ],
+  Array [
+    "\\\\a\\"",
+    "b\\\\\\\\\\"\\\\\\"",
+    "\\"\\"\\"\\"",
+  ],
+  Array [
+    "\\\\x\\"\\"x\\"\\"\\"",
+    "\\\\y",
+    "z\\\\\\\\\\\\\\\\\\\\\\"",
+  ],
+]
+`;
+
+exports[`CSV: quoted-with-quotes.csv: quoted-with-quotes.csv 1`] = `
+Array [
+  Array [
+    "A\\"",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "b\\"",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z\\"",
+  ],
+]
+`;
+
+exports[`CSV: separator-in-data.csv: separator-in-data.csv 1`] = `
+Array [
+  Array [
+    "A",
+    ",B,,",
+    "C",
+  ],
+  Array [
+    "a",
+    "b,",
+    "c",
+  ],
+  Array [
+    "x",
+    ",y",
+    "z",
+  ],
+]
+`;
+
+exports[`CSV: simple.csv: simple.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "b",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z",
+  ],
+]
+`;

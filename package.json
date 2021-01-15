@@ -1,0 +1,46 @@
+{
+  "name": "@alesmenzel/csv",
+  "version": "1.0.0",
+  "description": "CSV parser",
+  "main": "csv-parser.js",
+  "keywords": [
+    "csv",
+    "parser"
+  ],
+  "author": "Ales Menzel <alesmenzel@gmail.com> (https://github.com/alesmenzel)",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "format": "eslint --fix ."
+  },
+  "engines": {
+    "node": "^12.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/eslint-parser": "^7.12.1",
+    "@babel/eslint-plugin": "^7.12.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.21",
+    "eslint": "^7.17.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "husky": "^4.3.7",
+    "jest": "^26.6.3",
+    "lint-staged": "^10.5.3",
+    "prettier": "^2.2.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write"
+  }
+}
