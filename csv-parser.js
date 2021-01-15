@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 const {Transform} = require('stream')
 
 // Default options
@@ -122,9 +123,7 @@ class CSVParser extends Transform {
 
         // Backpressure
         if (!this.push(cells)) {
-          console.log('Backpressure - waiting for drain')
           this.once('drain', () => {
-            console.log('drained - can continue')
             this._parse(cell, encoding, next)
           })
           return
