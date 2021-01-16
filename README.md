@@ -25,7 +25,7 @@ const csv = new createCSVParser({
 
 const rows = []
 csv.on('data', (row) => {
-  rows.push(rows)
+  rows.push(row)
 })
 
 csv.on('end', () => {
