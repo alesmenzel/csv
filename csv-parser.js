@@ -1,5 +1,5 @@
 /* eslint-disable no-loop-func */
-const {Transform} = require('stream')
+const {Duplex} = require('stream')
 
 // Default options
 const DELIMITER = ','
@@ -9,22 +9,45 @@ const ESCAPE = '\\'
 // Constants
 const CR = '\r'
 
-class CSVParser extends Transform {
+class CSVParser extends Duplex {
+  // Cell delimiter
   #delimiter;
 
+  // Row delimiter
   #rowDelimiter;
 
+  // Quote option
   #quote;
 
+  // Escape option
   #escape;
 
+  // Cells parsed from a row
   #cells = [];
 
+  // Current parsed row count
   #rowCount = 0;
 
+  // Tracks the column (character) we are at from the start of row
+  #charCount = 1
+
+  // Number of columns in the CSV
   #columnCount = null;
 
-  #leftover = ''
+  // Accumulator for cell
+  #cell = ''
+
+  // Are we in a quoted cell?
+  #quoted = false
+
+  // Are we at the start of a cell?
+  #startOfCell = true
+
+  // Are we at the end of a cell?
+  #endOfCell = false
+
+  // Are we escaping the current character?
+  #escaped = false
 
   constructor({ delimiter = DELIMITER, quote = QUOTE, escape = ESCAPE, rowDelimiter = ROW_DELIMITER, ...rest } = {}) {
     super({
@@ -50,67 +73,62 @@ class CSVParser extends Transform {
     this.#escape = escape;
   }
 
-  _parse(csvStr, encoding, next) {
+  _parse(csvStr, next) {
     let i = 0;
-    let rowStart = 0;
-    let cell = ''
-    let quoted = false
-    let startOfCell = true
-    let endOfCell = false
-    let escaped = false
 
     while (csvStr[i] !== undefined) {
       const char = csvStr[i]
       const nextChar = csvStr[i + 1]
+      this.#charCount += 1
       i += 1
 
       // Start of cell
-      if (startOfCell) {
-        startOfCell = false
+      if (this.#startOfCell) {
+        this.#startOfCell = false
         // Optional quoting
-        if (!quoted && char === this.#quote) {
-          quoted = true
+        if (!this.#quoted && char === this.#quote) {
+          this.#quoted = true
           continue;
         }
       }
 
       // Escaping with escape character
-      if (!escaped && char === this.#escape) {
-        cell += char
-        escaped = true;
+      if (!this.#escaped && char === this.#escape) {
+        this.#cell += char
+        this.#escaped = true;
         continue;
       }
       // Escaping by preceeding quote with another quote
-      if (!escaped && quoted && char === this.#quote && nextChar === this.#quote) {
-        escaped = true;
+      if (!this.#escaped && this.#quoted && char === this.#quote && nextChar === this.#quote) {
+        this.#escaped = true;
         continue;
       }
 
       // End of cell
-      if (!escaped && quoted && char === this.#quote) {
-        quoted = false
-        endOfCell = true
+      if (!this.#escaped && this.#quoted && char === this.#quote) {
+        this.#quoted = false
+        this.#endOfCell = true
         continue;
       }
 
       // Delimiter
-      if (!quoted && char === this.#delimiter) {
-        startOfCell = true
-        endOfCell = false
-        this.#cells.push(cell)
-        cell = ''
+      if (!this.#quoted && char === this.#delimiter) {
+        this.#startOfCell = true
+        this.#endOfCell = false
+        this.#cells.push(this.#cell)
+        this.#cell = ''
         continue;
       }
 
       // End of row
-      if (!quoted && char === this.#rowDelimiter) {
-        this.#cells.push(cell)
-        cell = ''
-        startOfCell = true
-        endOfCell = false
+      if (!this.#quoted && char === this.#rowDelimiter) {
+        this.#cells.push(this.#cell)
+        this.#cell = ''
+        this.#startOfCell = true
+        this.#endOfCell = false
 
         this.#rowCount += 1
-        rowStart = i
+        this.#charCount = 1
 
         if (this.#columnCount === null) this.#columnCount = this.#cells.length
         if (this.#columnCount !== this.#cells.length) {
@@ -123,32 +141,45 @@ class CSVParser extends Transform {
 
         // Backpressure
         if (!this.push(cells)) {
-          this.once('drain', () => {
-            this._parse(cell, encoding, next)
-          })
+          this.once('read', () => this._parse(csvStr.slice(i), next))
           return
         }
         continue;
       }
-      if (!quoted && char === CR) continue;
+      if (!this.#quoted && char === CR) continue;
 
       // Do not allow any characters after quoted field except delimiter/row-delimiter
-      if (endOfCell) {
-        next(new Error(`No characters are allowed after quoted cell except delimiter, given '${char}' at line ${this.#rowCount + 1}, col ${i - rowStart}`))
+      if (this.#endOfCell) {
+        next(new Error(`No characters are allowed after quoted cell except delimiter, given '${char}' at line ${this.#rowCount + 1}, col ${this.#charCount}`))
         return
       }
 
-      cell += char
-      escaped = false
+      this.#cell += char
+      this.#escaped = false
     }
 
-    this.#leftover = cell
     next()
   }
 
-  _transform(chunk, encoding, next) {
-    const csvStr = this.#leftover + Buffer.isBuffer(chunk) ? chunk.toString() : chunk
-    this._parse(csvStr, encoding, next)
+  _write(chunk, encoding, next) {
+    const csvStr = Buffer.isBuffer(chunk) ? chunk.toString() : chunk
+    this._parse(csvStr, next)
+  }
+
+  _writev(chunks, next) {
+    const csvStr = chunks
+      .map(({chunk}) => Buffer.isBuffer(chunk) ? chunk.toString() : chunk)
+      .reduce((acc, chunk) => acc + chunk, '')
+    this._parse(csvStr, next)
+  }
+
+  _final(next) {
+    this.push(null);
+    next()
+  }
+
+  _read() {
+    this.emit('read')
   }
 }
 

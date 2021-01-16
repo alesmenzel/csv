@@ -62,6 +62,9 @@ web_modules/
 # Optional REPL history
 .node_repl_history
 
+# Mac
+.DS_Store
+
 # Output of 'npm pack'
 *.tgz
 
@@ -117,3 +120,6 @@ dist
 
 # IDE
 .vscode/
+
+# Temp
+temp/

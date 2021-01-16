@@ -1,0 +1,27 @@
+# Mac
+.DS_Store
+
+# Test files
+csv/
+csv-malformed/
+csv-benchmark/
+
+# Tests
+tests/
+
+# Examples
+example/
+
+# Dev scripts
+scripts/
+
+# Workflows
+.github/
+
+# Config files
+.gitignore
+.eslintrc.js
+.npmignore
+.prettierrc
+babel.config.json
+jest.config.js
