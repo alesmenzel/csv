@@ -1,5 +1,7 @@
 # @alesmenzel/csv
 
+![CI](https://github.com/alesmenzel/csv/workflows/CI/badge.svg?branch=master)
+
 Simple and elegant streaming `csv` parser.
 
 Handles formats defined by [RFC4180](https://tools.ietf.org/html/rfc4180) but also works with format produced by PHP's [fputcsv](https://www.php.net/manual/en/function.fputcsv.php). Note in mind, that there is no defacto standard for CSV and different csv libraries create slightly different versions, for example some of them
