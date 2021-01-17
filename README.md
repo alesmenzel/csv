@@ -4,18 +4,13 @@ Simple and elegant streaming `csv` parser.
 
 Handles formats defined by [RFC4180](https://tools.ietf.org/html/rfc4180) but also works with format produced by PHP's [fputcsv](https://www.php.net/manual/en/function.fputcsv.php). Note in mind, that there is no defacto standard for CSV and different csv libraries create slightly different versions, for example some of them
 
-- use comments in csv `# this is a comment` (see `relaxComments` and `comment` options)
+- use comments in csv `# this is a comment` (see [`relaxComments` and `comment`](#options) options)
 - use escaping character instead of double quoting `"\""` (this is valid csv cell in PHP's version, handled by default)
-- use blank spaces after quoted fields `"abc" ,"cde"` (see `relaxCharactersAfterQuotedText` option)
+- use blank spaces after quoted fields `"abc" ,"cde"` (see [`relaxCharactersAfterQuotedText`](#options) option)
 - output different column count per each row (see `relaxColumnCount` option)
+- [Byte Order Mark (BOM)](https://en.wikipedia.org/wiki/Byte_order_mark) at the start of CSV (see [`bom`](#options) option)
 
-```csv
-a,b,c
-1,2
-4,5,6
-```
-
-By default we are very strict about parsing the CSV, but can use the `relax*` rules to lower the bar.
+By default we are very strict about parsing the CSV, but can use the [`relax*`](#options) rules to lower the bar.
 
 ## Installation
 
@@ -33,6 +28,7 @@ const csv = new createCSVParser({
   // quote: '"' (default)
   // rowDelimiter: '\n' (default) - handles \r\n as well
   // escape: '\\' (default)
+  // ... and other (see options below)
   // ... you can pass Transform stream options here - e.g. highWaterMark
 })
 
@@ -59,6 +55,7 @@ csv.end('x,"Joe ""The Death"" Black",z\n')
 | `quote`                                            | Single character that is used to quote the value of a cell.                                   | `"`                              |
 | `escape`                                           | Single character that is used to escape a character inside the cell.                          | `\`                              |
 | `comment`                                          | Single character that is used to define a comment line.                                       | `#`                              |
+| `bom`                                              | Strip BOM from the first line of CSV if present.                                              | `true`                           |
 | `relaxComments`                                    | Allow comments in CSV. Comments are lines that start with the `comment` character.            | `false`                          |
 | `relaxCharactersAfterQuotedText`                   | Allow extranious characters after end of quoted cell, but those extra characters are ignored. | `false`                          |
 | `relaxComments`                                    | Allow comments in CSV. Comments are lines that start with the `comment` character.            | `false`                          |

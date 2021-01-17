@@ -242,3 +242,23 @@ Array [
   ],
 ]
 `;
+
+exports[`CSV: simple-quoted-bom.csv: simple-quoted-bom.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "b",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z",
+  ],
+]
+`;

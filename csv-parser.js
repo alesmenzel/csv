@@ -1,5 +1,6 @@
 /* eslint-disable no-loop-func */
 const {Duplex} = require('stream')
+const {stripBOM} = require('./util')
 
 // Default options
 const DELIMITER = ','
@@ -25,6 +26,9 @@ class CSVParser extends Duplex {
 
   // Comment character
   #comment;
+
+  // Strip BOM
+  #bom = true
 
   // Relax: Allow comments inside the csv
   #relaxComments;
@@ -68,12 +72,16 @@ class CSVParser extends Duplex {
   // Are we escaping the current character?
   #escaped = false
 
+  // Is it the first chunk?
+  #firstChunk = true
+
   constructor({
     delimiter = DELIMITER,
     quote = QUOTE,
     escape = ESCAPE,
     rowDelimiter = ROW_DELIMITER,
     comment = COMMENT,
+    bom = true,
     relaxComments = false,
     relaxCharactersAfterQuotedText = false,
     relaxColumnCount = false,
@@ -101,6 +109,7 @@ class CSVParser extends Duplex {
     this.#quote = quote;
     this.#escape = escape;
     this.#comment = comment;
+    this.#bom = bom;
     this.#relaxComments = relaxComments;
     this.#relaxCharactersAfterQuotedText = relaxCharactersAfterQuotedText;
     this.#relaxColumnCount = relaxColumnCount;
@@ -217,14 +226,24 @@ class CSVParser extends Duplex {
   }
 
   _write(chunk, encoding, next) {
-    const csvStr = Buffer.isBuffer(chunk) ? chunk.toString() : chunk
+    let csvStr = Buffer.isBuffer(chunk) ? chunk.toString() : chunk
+    // BOM
+    if (this.#firstChunk) {
+      this.#firstChunk = false
+      csvStr = stripBOM(csvStr)
+    }
     this._parse(csvStr, next)
   }
 
   _writev(chunks, next) {
-    const csvStr = chunks
+    let csvStr = chunks
       .map(({chunk}) => Buffer.isBuffer(chunk) ? chunk.toString() : chunk)
       .reduce((acc, chunk) => acc + chunk, '')
+    // BOM
+    if (this.#firstChunk) {
+      this.#firstChunk = false
+      csvStr = stripBOM(csvStr)
+    }
     this._parse(csvStr, next)
   }
 
