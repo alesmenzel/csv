@@ -6,6 +6,7 @@ const DELIMITER = ','
 const ROW_DELIMITER = '\n'
 const QUOTE = '"'
 const ESCAPE = '\\'
+const COMMENT = '#'
 // Constants
 const CR = '\r'
 
@@ -21,6 +22,18 @@ class CSVParser extends Duplex {
 
   // Escape option
   #escape;
+
+  // Comment character
+  #comment;
+
+  // Relax: Allow comments inside the csv
+  #relaxComments;
+
+  // Relax: Allow characters after quoted text, but ignore those
+  #relaxCharactersAfterQuotedText;
+
+  // Relax: Allow rows with incorrect column count
+  #relaxColumnCount;
 
   // Cells parsed from a row
   #cells = [];
@@ -40,6 +53,12 @@ class CSVParser extends Duplex {
   // Are we in a quoted cell?
   #quoted = false
 
+  // Are we in a comment?
+  #commented = false;
+
+  // Are we at the start of a new line
+  #startOfLine = true
+
   // Are we at the start of a cell?
   #startOfCell = true
 
@@ -49,7 +68,17 @@ class CSVParser extends Duplex {
   // Are we escaping the current character?
   #escaped = false
 
-  constructor({ delimiter = DELIMITER, quote = QUOTE, escape = ESCAPE, rowDelimiter = ROW_DELIMITER, ...rest } = {}) {
+  constructor({
+    delimiter = DELIMITER,
+    quote = QUOTE,
+    escape = ESCAPE,
+    rowDelimiter = ROW_DELIMITER,
+    comment = COMMENT,
+    relaxComments = false,
+    relaxCharactersAfterQuotedText = false,
+    relaxColumnCount = false,
+    ...rest
+  } = {}) {
     super({
       ...rest,
       readableObjectMode: true,
@@ -71,6 +100,10 @@ class CSVParser extends Duplex {
     this.#rowDelimiter = rowDelimiter;
     this.#quote = quote;
     this.#escape = escape;
+    this.#comment = comment;
+    this.#relaxComments = relaxComments;
+    this.#relaxCharactersAfterQuotedText = relaxCharactersAfterQuotedText;
+    this.#relaxColumnCount = relaxColumnCount;
   }
 
   _parse(csvStr, next) {
@@ -82,6 +115,17 @@ class CSVParser extends Duplex {
       this.#charCount += 1
       i += 1
 
+      // Start of line
+      if (this.#startOfLine) {
+        this.#startOfLine = false
+        // Comment line
+        if (char === this.#comment && this.#relaxComments) {
+          this.#commented = true
+          this.#startOfCell = false
+          continue;
+        }
+      }
+
       // Start of cell
       if (this.#startOfCell) {
         this.#startOfCell = false
@@ -92,13 +136,13 @@ class CSVParser extends Duplex {
         }
       }
 
-      // Escaping with escape character
-      if (!this.#escaped && char === this.#escape) {
+      // Escaping with escape character in quoted field
+      if (!this.#escaped && this.#quoted && char === this.#escape) {
         this.#cell += char
         this.#escaped = true;
         continue;
       }
-      // Escaping by preceeding quote with another quote
+      // Escaping by preceeding quote with another quote in quoted field
       if (!this.#escaped && this.#quoted && char === this.#quote && nextChar === this.#quote) {
         this.#escaped = true;
         continue;
@@ -112,7 +156,7 @@ class CSVParser extends Duplex {
       }
 
       // Delimiter
-      if (!this.#quoted && char === this.#delimiter) {
+      if (!this.#quoted && !this.#commented && char === this.#delimiter) {
         this.#startOfCell = true
         this.#endOfCell = false
         this.#cells.push(this.#cell)
@@ -122,16 +166,26 @@ class CSVParser extends Duplex {
 
       // End of row
       if (!this.#quoted && char === this.#rowDelimiter) {
-        this.#cells.push(this.#cell)
+        const cell = this.#cell
         this.#cell = ''
+        this.#startOfLine = true
         this.#startOfCell = true
         this.#endOfCell = false
+
+        // End of comment line
+        if (this.#commented) {
+          this.#commented = false
+          this.emit('comment', cell)
+          continue
+        }
+
+        this.#cells.push(cell)
 
         this.#rowCount += 1
         this.#charCount = 1
 
         if (this.#columnCount === null) this.#columnCount = this.#cells.length
-        if (this.#columnCount !== this.#cells.length) {
+        if (this.#columnCount !== this.#cells.length && !this.#relaxColumnCount) {
           next(new Error(`Row ${this.#rowCount} does not have the same number of columns as the first row, it has ${this.#cells.length}, but expected was ${this.#columnCount}`))
           return
         }
@@ -150,6 +204,7 @@ class CSVParser extends Duplex {
 
       // Do not allow any characters after quoted field except delimiter/row-delimiter
       if (this.#endOfCell) {
+        if (this.#relaxCharactersAfterQuotedText) continue
         next(new Error(`No characters are allowed after quoted cell except delimiter, given '${char}' at line ${this.#rowCount + 1}, col ${this.#charCount}`))
         return
       }

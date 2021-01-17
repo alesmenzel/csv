@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSV: relax comments: csv-comments.csv 1`] = `
+Array [
+  Array [
+    "A",
+    "B",
+    "C",
+  ],
+  Array [
+    "a",
+    "b",
+    "c",
+  ],
+  Array [
+    "x",
+    "y",
+    "z",
+  ],
+]
+`;
+
+exports[`CSV: relax comments: csv-comments.csv--comments 1`] = `
+Array [
+  " comment",
+  " this is a comment",
+  " multiline",
+  " next line",
+  " and another one",
+]
+`;
