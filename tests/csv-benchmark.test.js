@@ -8,10 +8,10 @@ const Collect = require('./collect')
 const pipelineAsync = promisify(pipeline)
 const files = [{
   file: 'random-csv-100K.csv',
-  budgetSeconds: 8
+  budgetSeconds: 12
 }, {
   file: 'random-csv-10K.csv',
-  budgetSeconds: 0.8
+  budgetSeconds: 1.2
 }]
 
 files.forEach(({file, budgetSeconds}) => {
