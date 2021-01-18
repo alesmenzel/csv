@@ -243,6 +243,31 @@ Array [
 ]
 `;
 
+exports[`CSV: simple-no-newline.csv: simple-no-newline.csv 1`] = `
+Array [
+  Array [
+    "Message",
+    "Interactions",
+    "Likes",
+  ],
+  Array [
+    "text message 1",
+    "13",
+    "73",
+  ],
+  Array [
+    "text message 2",
+    "73",
+    "73",
+  ],
+  Array [
+    "text message 3",
+    "173",
+    "173",
+  ],
+]
+`;
+
 exports[`CSV: simple-quoted-bom.csv: simple-quoted-bom.csv 1`] = `
 Array [
   Array [

@@ -54,6 +54,9 @@ class CSVParser extends Duplex {
   // Accumulator for cell
   #cell = ''
 
+  // Leftover CSV that cannot be parsed without next chunk
+  #leftover = ''
+
   // Are we in a quoted cell?
   #quoted = false
 
@@ -116,11 +119,20 @@ class CSVParser extends Duplex {
   }
 
   _parse(csvStr, next) {
+    this.#leftover = ''
     let i = 0;
 
     while (csvStr[i] !== undefined) {
       const char = csvStr[i]
       const nextChar = csvStr[i + 1]
+
+      // Last character in chunk is QUOTE, but we need next chunk to decide if it is end of cell or just text
+      if (i === csvStr.length - 1 && char === this.#quote) {
+        this.#leftover = csvStr.slice(i)
+        next()
+        return
+      }
+
       this.#charCount += 1
       i += 1
 
@@ -232,7 +244,7 @@ class CSVParser extends Duplex {
       this.#firstChunk = false
       csvStr = stripBOM(csvStr)
     }
-    this._parse(csvStr, next)
+    this._parse(this.#leftover + csvStr, next)
   }
 
   _writev(chunks, next) {
@@ -244,10 +256,19 @@ class CSVParser extends Duplex {
       this.#firstChunk = false
       csvStr = stripBOM(csvStr)
     }
-    this._parse(csvStr, next)
+    this._parse(this.#leftover + csvStr, next)
   }
 
   _final(next) {
+    if (this.#leftover) {
+      // Handle CSVs that are missing row delimiter at the end
+      if (!this.#leftover.endsWith(this.#rowDelimiter)) this.#leftover += this.#rowDelimiter
+      this._parse(this.#leftover, () => {
+        this.push(null);
+        next()
+      })
+      return
+    }
     this.push(null);
     next()
   }

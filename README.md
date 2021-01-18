@@ -11,6 +11,7 @@ Handles formats defined by [RFC4180](https://tools.ietf.org/html/rfc4180) but al
 - use blank spaces after quoted fields `"abc" ,"cde"` (see [`relaxCharactersAfterQuotedText`](#options) option)
 - output different column count per each row (see `relaxColumnCount` option)
 - [Byte Order Mark (BOM)](https://en.wikipedia.org/wiki/Byte_order_mark) at the start of CSV (see [`bom`](#options) option)
+- do not contain the row delimiter (e.g. newline) on the last row (handled by default)
 
 By default we are very strict about parsing the CSV, but can use the [`relax*`](#options) rules to lower the bar.
 
