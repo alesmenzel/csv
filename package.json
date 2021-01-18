@@ -16,7 +16,7 @@
     "format": "eslint --fix ."
   },
   "engines": {
-    "node": "^12.0.0"
+    "node": ">=12"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
