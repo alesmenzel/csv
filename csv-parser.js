@@ -238,7 +238,7 @@ class CSVParser extends Duplex {
       this.#escaped = false
     }
 
-    process.nextTick(next)
+    next()
   }
 
   _write(chunk, encoding, next) {
