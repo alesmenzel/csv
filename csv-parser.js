@@ -93,6 +93,8 @@ class CSVParser extends Duplex {
     super({
       ...rest,
       readableObjectMode: true,
+      writableHighWaterMark: 0,
+      readableHighWaterMark: 0,
     })
 
     if (!delimiter) throw new Error('Delimiter must be set')
