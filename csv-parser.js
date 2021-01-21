@@ -121,10 +121,14 @@ class CSVParser extends Duplex {
   _parse(csvStr, next) {
     this.#leftover = ''
     let i = 0;
+    let char;
+    let nextChar;
+    let cell;
+    let cells;
 
     while (csvStr[i] !== undefined) {
-      const char = csvStr[i]
-      const nextChar = csvStr[i + 1]
+      char = csvStr[i]
+      nextChar = csvStr[i + 1]
 
       // Last character in chunk is QUOTE, but we need next chunk to decide if it is end of cell or just text
       if (i === csvStr.length - 1 && char === this.#quote) {
@@ -187,7 +191,7 @@ class CSVParser extends Duplex {
 
       // End of row
       if (!this.#quoted && char === this.#rowDelimiter) {
-        const cell = this.#cell
+        cell = this.#cell
         this.#cell = ''
         this.#startOfLine = true
         this.#startOfCell = true
@@ -211,7 +215,7 @@ class CSVParser extends Duplex {
           return
         }
 
-        const cells = this.#cells
+        cells = this.#cells
         this.#cells = []
 
         // Backpressure
@@ -234,11 +238,11 @@ class CSVParser extends Duplex {
       this.#escaped = false
     }
 
-    next()
+    process.nextTick(next)
   }
 
   _write(chunk, encoding, next) {
-    let csvStr = Buffer.isBuffer(chunk) ? chunk.toString() : chunk
+    let csvStr = Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk
     // BOM
     if (this.#firstChunk) {
       this.#firstChunk = false
@@ -249,7 +253,7 @@ class CSVParser extends Duplex {
 
   _writev(chunks, next) {
     let csvStr = chunks
-      .map(({chunk}) => Buffer.isBuffer(chunk) ? chunk.toString() : chunk)
+      .map(({chunk}) => Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk)
       .reduce((acc, chunk) => acc + chunk, '')
     // BOM
     if (this.#firstChunk) {
